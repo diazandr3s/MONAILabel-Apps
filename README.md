@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Set of MONAI Label Apps that can be used in the MONAI Label platform
+Set of MONAI Label Apps that can be used in the [MONAI Label](https://github.com/Project-MONAI/MONAILabel) platform
 
 ## Features
 > _This codebase is currently under active development._
