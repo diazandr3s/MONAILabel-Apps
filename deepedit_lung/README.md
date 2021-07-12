@@ -8,6 +8,10 @@ Interactive MONAI Label App using DeepEdit to label lungs over CT Images
 
 The training data is from Kaggle (https://www.kaggle.com/andrewmvd/covid19-ct-scans).
 
+
+The script **convert_to_single_label.py** could be used to convert images from multiple label into single label
+
+
 - Target: Lungs
 - Task: Segmentation 
 - Modality: CT
