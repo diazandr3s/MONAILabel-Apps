@@ -22,4 +22,4 @@ The training data is from VerSe2020 dataset (https://osf.io/t98fz/). Single labe
 - 1 channel representing the Spine
 
 
-![DeepEdit for spine/vertebra](../../docs/images/sample-apps/deepedit_vertebra.png)
+![DeepEdit for spine/vertebra](../docs/images/sample-apps/deepedit_vertebra.png)

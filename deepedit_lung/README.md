@@ -22,4 +22,4 @@ The training data is from Kaggle (https://www.kaggle.com/andrewmvd/covid19-ct-sc
 - 1 channel representing lungs
 
 
-![DeepEdit for lungs](../../docs/images/sample-apps/deepedit_lungs.png)
+![DeepEdit for lungs](../docs/images/sample-apps/deepedit_lungs.png)

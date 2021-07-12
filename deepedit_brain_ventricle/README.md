@@ -22,4 +22,4 @@ The training data is from **PENDING LINK**.
 - 1 channel representing left ventricle
 
 
-![DeepEdit for left ventricle](../../docs/images/sample-apps/deepedit_left_ventricle.png)
+![DeepEdit for left ventricle](../docs/images/sample-apps/deepedit_left_ventricle.png)

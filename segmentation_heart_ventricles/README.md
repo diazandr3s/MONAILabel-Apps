@@ -20,4 +20,4 @@ We used 15 cardiac MR images (both ED and ES) to train this model. In order to c
 
 - 4 channel representing background, right ventricle (RV), left ventricle (LV), and LV wall
 
-![Heart chambers segmentation](../../docs/images/sample-apps/segmentation_heart_ventricles.png)
+![Heart chambers segmentation](../docs/images/sample-apps/segmentation_heart_ventricles.png)

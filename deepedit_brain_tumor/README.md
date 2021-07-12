@@ -22,4 +22,4 @@ The training data is from the Multimodal Brain Tumor Segmentation Challenge (Bra
 - 1 channel representing brain tumor
 
 
-![DeepEdit for Brain Tumor](../../docs/images/sample-apps/deepedit_brain_tumor.png)
+![DeepEdit for Brain Tumor](../docs/images/sample-apps/deepedit_brain_tumor.png)
