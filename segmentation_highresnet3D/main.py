@@ -6,32 +6,38 @@ from lib import MyInfer, MyStrategy, MyTrain
 
 from monailabel.interfaces import MONAILabelApp
 from monailabel.utils.activelearning import Random
+from monai.networks.nets import HighResNet
 
 logger = logging.getLogger(__name__)
 
 
 class MyApp(MONAILabelApp):
     def __init__(self, app_dir, studies):
-        self.network = torch.hub.load("fepegar/highresnet", "highres3dnet", pretrained=True)
+        self.network = HighResNet(
+            spatial_dims=3,
+            in_channels=1,
+            out_channels=208
+        )
 
         self.model_dir = os.path.join(app_dir, "model")
-        self.pretrained_model = os.path.join(self.model_dir, "pretrained.pt")
+        # self.pretrained_model = os.path.join(self.model_dir, "pretrained.pt")
         self.final_model = os.path.join(self.model_dir, "model.pt")
 
-        self.download(
-            [
-                (
-                    self.pretrained_model,
-                    "https://github.com/fepegar/highresnet-models/raw/master/highres3dnet_li_parameters-7d297872.pth",
-                ),
-            ]
-        )
+        # self.download(
+        #     [
+        #         (
+        #             self.pretrained_model,
+        #             "https://github.com/fepegar/highresnet-models/raw/master/highres3dnet_li_parameters-7d297872.pth",
+        #         ),
+        #     ]
+        # )
 
         super().__init__(app_dir, studies, os.path.join(self.model_dir, "train_stats.json"))
 
     def init_infers(self):
         return {
-            "segmentation": MyInfer([self.pretrained_model, self.final_model], self.network),
+            # "segmentation": MyInfer([self.pretrained_model, self.final_model], self.network),
+            "segmentation": MyInfer(self.final_model, self.network),
         }
 
     def init_strategies(self):
@@ -47,8 +53,8 @@ class MyApp(MONAILabelApp):
 
         # App Owner can decide which checkpoint to load (from existing output folder or from base checkpoint)
         load_path = os.path.join(output_dir, "model.pt")
-        if not os.path.exists(load_path) and request.get("pretrained", True):
-            load_path = self.pretrained_model
+        # if not os.path.exists(load_path) and request.get("pretrained", True):
+        #     load_path = self.pretrained_model
 
         # Datalist for train/validation
         train_d, val_d = self.partition_datalist(self.datastore().datalist(), request.get("val_split", 0.2))
