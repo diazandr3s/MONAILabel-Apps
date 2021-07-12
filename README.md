@@ -11,6 +11,9 @@ Set of MONAI Label Apps that can be used in the [MONAI Label](https://github.com
 - Apps for multiple label segmentation using the automatic segmentation paradigm.
 
 
+> _Please don't hesitate to ask/comment/suggest anything regarding these Apps
+
+
 ## Community
 Join the conversation on Twitter [@ProjectMONAI](https://twitter.com/ProjectMONAI) or join our [Slack channel](https://forms.gle/QTxJq3hFictp31UM9).
 
