@@ -52,7 +52,7 @@ class MyApp(MONAILabelApp):
             [
                 (
                     self.pretrained_model,
-                    "https://www.dropbox.com/s/a2fqn2hzgdxkrth/deepedit_vertebra.pt?dl=1",
+                    "https://github.com/diazandr3s/MONAILabel-Apps/releases/download/pretrained/deepedit_vertebra.pt",
                 ),
             ]
         )

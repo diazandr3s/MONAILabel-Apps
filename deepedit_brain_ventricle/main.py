@@ -52,7 +52,7 @@ class MyApp(MONAILabelApp):
             [
                 (
                     self.pretrained_model,
-                    "https://www.dropbox.com/s/ognjtcx6zhu78w4/deepedit_brain_ventricle.pt?dl=1",
+                    "https://github.com/diazandr3s/MONAILabel-Apps/releases/download/pretrained/deepedit_brain_ventricle.pt",
                 ),
             ]
         )
