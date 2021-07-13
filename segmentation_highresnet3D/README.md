@@ -1,4 +1,4 @@
-#  Brain parcelation using highresnet 3D
+#  Brain parcelation using highresnet 3D -  WORK IN PROGRESS
 
 ### Model Overview
 
