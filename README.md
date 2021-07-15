@@ -5,7 +5,7 @@
 Set of MONAI Label Apps that can be used in the [MONAI Label](https://github.com/Project-MONAI/MONAILabel) platform
 
 ## Features
-> _This codebase is currently under active development._
+> _This codebase is currently under active development. Please don't hesitate to ask/comment/suggest anything regarding these Apps_
 
 - DeepEdit Apps for multiple tasks
 - Apps for multiple label segmentation using the automatic segmentation paradigm.
