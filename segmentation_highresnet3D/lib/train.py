@@ -4,16 +4,17 @@ import numpy as np
 from monai.inferers import SlidingWindowInferer
 from monai.transforms import (
     Activationsd,
-    AddChanneld,
     AsDiscreted,
+    CenterSpatialCropd,
     EnsureChannelFirstd,
     Compose,
     LoadImaged,
-    RandShiftIntensityd,
+    RandHistogramShiftd,
     NormalizeIntensityd,
     Orientationd,
+    RandSpatialCropd,
     RandAffined,
-    Resized,
+    RandRotated,
     Spacingd,
     ToTensord,
 )
@@ -25,11 +26,11 @@ logger = logging.getLogger(__name__)
 
 class MyTrain(BasicTrainTask):
     def train_pre_transforms(self):
+        # Train using resized transform + simple inferrer OR randomcrop randaffine and use sliding window inferrer
         return Compose(
             [
                 LoadImaged(keys=("image", "label")),
                 EnsureChannelFirstd(keys=("image", "label")),
-                # AddChanneld(keys=("image", "label")),
                 Orientationd(keys=("image", "label"), axcodes="RAS"),
                 Spacingd(
                     keys=("image", "label"),
@@ -37,15 +38,17 @@ class MyTrain(BasicTrainTask):
                     mode=("bilinear", "nearest"),
                 ),
                 NormalizeIntensityd(keys="image"),
-                RandShiftIntensityd(keys="image", offsets=0.1, prob=0.5),
+                RandHistogramShiftd(keys="image"),
+                RandSpatialCropd(keys=("image", "label"), roi_size=(96, 96, 96)),
                 RandAffined(
-                    keys=["image", "label"],
+                    keys=("image", "label"),
                     mode=("bilinear", "nearest"),
                     prob=1.0,
-                    spatial_size=(112, 112, 112),
+                    spatial_size=(96, 96, 96),
                     rotate_range=(0, 0, np.pi / 15),
                     scale_range=(0.1, 0.1, 0.1),
                 ),
+                RandRotated(keys=("image", "label"), range_x=[-10, 10], range_y=[-10, 10], range_z=[-10, 10]),
                 ToTensord(keys=("image", "label")),
             ]
         )
@@ -69,7 +72,6 @@ class MyTrain(BasicTrainTask):
             [
                 LoadImaged(keys=("image", "label")),
                 EnsureChannelFirstd(keys=("image", "label")),
-                # AddChanneld(keys=("image", "label")),
                 Orientationd(keys=("image", "label"), axcodes="RAS"),
                 Spacingd(
                     keys=("image", "label"),
@@ -77,10 +79,10 @@ class MyTrain(BasicTrainTask):
                     mode=("bilinear", "nearest"),
                 ),
                 NormalizeIntensityd(keys="image"),
-                Resized(keys=("image", "label"), spatial_size=(112, 112, 112), mode=("area", "nearest")),
+                CenterSpatialCropd(keys=("image", "label"), roi_size=[128, 128, 128]),
                 ToTensord(keys=("image", "label")),
             ]
         )
 
     def val_inferer(self):
-        return SlidingWindowInferer(roi_size=(112, 112, 112))
+        return SlidingWindowInferer(roi_size=(96, 96, 96))

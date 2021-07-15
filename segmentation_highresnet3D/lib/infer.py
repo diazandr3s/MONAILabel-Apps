@@ -6,7 +6,6 @@ from monai.transforms import (
     LoadImaged,
     NormalizeIntensityd,
     Orientationd,
-    Resized,
     Spacingd,
     ToNumpyd,
     ToTensord,
@@ -182,12 +181,11 @@ class MyInfer(InferTask):
             Orientationd(keys="image", axcodes="RAS"),
             Spacingd(keys="image", pixdim=[1.0, 1.0, 1.0]),
             NormalizeIntensityd(keys="image"),
-            Resized(keys="image", spatial_size=(112, 112, 112)),
             ToTensord(keys="image"),
         ]
 
     def inferer(self):
-        return SlidingWindowInferer(roi_size=(112, 112, 112))
+        return SlidingWindowInferer(roi_size=(96, 96, 96))
 
     def inverse_transforms(self):
         return []  # Self-determine from the list of pre-transforms provided
