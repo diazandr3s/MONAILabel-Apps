@@ -227,5 +227,5 @@ ProstateX-0203
 
 ### 3DSlicer
 
-![DeepEdit for prostate](../docs/images/sample-apps/deepedit_prostate.png)
+![DeepEdit for prostate](../docs/images/sample-apps/deepedit_prostate.PNG)
 
