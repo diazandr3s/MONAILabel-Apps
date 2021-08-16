@@ -1,6 +1,7 @@
 from monai.inferers import SlidingWindowInferer
 from monai.transforms import (
     Activationsd,
+    CenterSpatialCropd,
     EnsureChannelFirstd,
     AsDiscreted,
     LoadImaged,
@@ -181,6 +182,7 @@ class MyInfer(InferTask):
             Orientationd(keys="image", axcodes="RAS"),
             Spacingd(keys="image", pixdim=[1.0, 1.0, 1.0]),
             NormalizeIntensityd(keys="image"),
+            CenterSpatialCropd(keys="image", roi_size=[128, 128, 128]),
             ToTensord(keys="image"),
         ]
 

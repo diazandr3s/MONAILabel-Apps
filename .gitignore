@@ -137,6 +137,10 @@ ENV/
 .idea/
 .vscode/
 
+# apps
+./*/logs
+./*/train
+
 *.nii.gz
 .DS_Store
 *.DS_Store
