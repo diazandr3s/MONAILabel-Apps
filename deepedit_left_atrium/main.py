@@ -63,7 +63,7 @@ class MyApp(MONAILabelApp):
             [
                 (
                     self.pretrained_model,
-                    "https://github.com/Project-MONAI/MONAILabel/releases/download/data/deepedit_left_atrium.pt",
+                    "https://github.com/diazandr3s/MONAILabel-Apps/releases/download/pretrained/deepedit_left_atrium.pt",
                 ),
             ]
         )
