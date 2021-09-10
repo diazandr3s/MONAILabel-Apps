@@ -12,25 +12,19 @@
 import logging
 import os
 
-from lib import (
-    MyStrategy,
-    MyTrain,
-    SegmentationWithWriteLogits,
-    SpleenISegGraphCut,
-    SpleenISegGraphcutColdstart,
-    SpleenISegSimpleCRF,
-)
+from lib import MyStrategy, MyTrain, SegmentationWithWriteLogits, SpleenISegGraphCut, SpleenISegSimpleCRF
 from monai.apps import load_from_mmar
 
-from monailabel.interfaces import MONAILabelApp
-from monailabel.interfaces.tasks import InferType
-from monailabel.utils.activelearning import Random
+from monailabel.interfaces.app import MONAILabelApp
+from monailabel.interfaces.tasks.infer import InferType
+from monailabel.scribbles.infer import HistogramBasedGraphCut
+from monailabel.utils.activelearning.random import Random
 
 logger = logging.getLogger(__name__)
 
 
 class MyApp(MONAILabelApp):
-    def __init__(self, app_dir, studies):
+    def __init__(self, app_dir, studies, conf):
         self.model_dir = os.path.join(app_dir, "model")
         self.final_model = os.path.join(self.model_dir, "model.pt")
 
@@ -39,10 +33,10 @@ class MyApp(MONAILabelApp):
         super().__init__(
             app_dir=app_dir,
             studies=studies,
+            conf=conf,
             name="Segmentation - Spleen + Scribbles",
             description="Active Learning solution to label Spleen Organ over 3D CT Images.  "
             "It includes multiple scribbles method that incorporate user scribbles to improve labels",
-            version=2,
         )
 
     def init_infers(self):
@@ -50,7 +44,7 @@ class MyApp(MONAILabelApp):
             "Spleen_Segmentation": SegmentationWithWriteLogits(
                 self.final_model, load_from_mmar(self.mmar, self.model_dir)
             ),
-            "Coldstart->ISeg+GraphCut": SpleenISegGraphcutColdstart(),
+            "histogramBasedGraphCut": HistogramBasedGraphCut(),
             "ISeg+GraphCut": SpleenISegGraphCut(),
             "ISeg+SimpleCRF": SpleenISegSimpleCRF(),
         }
