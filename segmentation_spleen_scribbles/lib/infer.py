@@ -19,11 +19,12 @@ from monai.transforms import (
     ScaleIntensityRanged,
     Spacingd,
     ToNumpyd,
+    ToTensord,
 )
 
 from monailabel.interfaces.tasks.infer import InferTask, InferType
 from monailabel.scribbles.transforms import WriteLogits
-from monailabel.utils.others.post import BoundingBoxd, Restored
+from monailabel.transform.post import BoundingBoxd, Restored
 
 
 class SegmentationWithWriteLogits(InferTask):
@@ -56,6 +57,7 @@ class SegmentationWithWriteLogits(InferTask):
             AddChanneld(keys="image"),
             Spacingd(keys="image", pixdim=[1.0, 1.0, 1.0]),
             ScaleIntensityRanged(keys="image", a_min=-57, a_max=164, b_min=0.0, b_max=1.0, clip=True),
+            ToTensord(keys="image"),
         ]
 
     def inferer(self):

@@ -11,14 +11,22 @@
 
 import logging
 import os
+from distutils.util import strtobool
+from typing import Dict
 
-from lib import MyStrategy, MyTrain, SegmentationWithWriteLogits, SpleenISegGraphCut, SpleenISegSimpleCRF
+from lib import MyTrain, SegmentationWithWriteLogits, SpleenISegGraphCut, SpleenISegSimpleCRF
+from lib.activelearning import MyStrategy
 from monai.apps import load_from_mmar
 
 from monailabel.interfaces.app import MONAILabelApp
-from monailabel.interfaces.tasks.infer import InferType
+from monailabel.interfaces.tasks.infer import InferTask, InferType
+from monailabel.interfaces.tasks.scoring import ScoringMethod
+from monailabel.interfaces.tasks.strategy import Strategy
+from monailabel.interfaces.tasks.train import TrainTask
 from monailabel.scribbles.infer import HistogramBasedGraphCut
-from monailabel.utils.activelearning.random import Random
+from monailabel.tasks.activelearning.random import Random
+from monailabel.tasks.activelearning.tta import TTA
+from monailabel.tasks.scoring.tta import TTAScoring
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +38,10 @@ class MyApp(MONAILabelApp):
 
         self.mmar = "clara_pt_spleen_ct_segmentation_1"
 
+        self.tta_enabled = strtobool(conf.get("tta_enabled", "false"))
+        self.tta_samples = int(conf.get("tta_samples", "5"))
+        logger.info(f"TTA Enabled: {self.tta_enabled}; Samples: {self.tta_samples}")
+
         super().__init__(
             app_dir=app_dir,
             studies=studies,
@@ -39,12 +51,12 @@ class MyApp(MONAILabelApp):
             "It includes multiple scribbles method that incorporate user scribbles to improve labels",
         )
 
-    def init_infers(self):
+    def init_infers(self) -> Dict[str, InferTask]:
         infers = {
             "Spleen_Segmentation": SegmentationWithWriteLogits(
                 self.final_model, load_from_mmar(self.mmar, self.model_dir)
             ),
-            "histogramBasedGraphCut": HistogramBasedGraphCut(),
+            "Histogram+GraphCut": HistogramBasedGraphCut(),
             "ISeg+GraphCut": SpleenISegGraphCut(),
             "ISeg+SimpleCRF": SpleenISegSimpleCRF(),
         }
@@ -53,18 +65,31 @@ class MyApp(MONAILabelApp):
         infers.update(self.deepgrow_infer_tasks(self.model_dir))
         return infers
 
-    def init_trainers(self):
+    def init_trainers(self) -> Dict[str, TrainTask]:
         return {
             "segmentation_spleen": MyTrain(
                 self.model_dir, load_from_mmar(self.mmar, self.model_dir), publish_path=self.final_model
             )
         }
 
-    def init_strategies(self):
-        return {
-            "random": Random(),
-            "first": MyStrategy(),
-        }
+    def init_strategies(self) -> Dict[str, Strategy]:
+        strategies: Dict[str, Strategy] = {}
+        if self.tta_enabled:
+            strategies["TTA"] = TTA()
+        strategies["random"] = Random()
+        strategies["first"] = MyStrategy()
+        return strategies
+    def init_scoring_methods(self) -> Dict[str, ScoringMethod]:
+        methods: Dict[str, ScoringMethod] = {}
+        if self.tta_enabled:
+            methods["TTA"] = TTAScoring(
+                model=self.final_model,
+                network=load_from_mmar(self.mmar, self.model_dir),
+                num_samples=self.tta_samples,
+                spatial_size=(128, 128, 64),
+                spacing=(1.0, 1.0, 1.0),
+            )
+        return methods
 
     def infer(self, request, datastore=None):
         image = request.get("image")
