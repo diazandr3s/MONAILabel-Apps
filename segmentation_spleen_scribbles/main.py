@@ -14,7 +14,7 @@ import os
 from distutils.util import strtobool
 from typing import Dict
 
-from lib import MyTrain, SegmentationWithWriteLogits, SpleenISegGraphCut, SpleenISegSimpleCRF
+from lib import MyTrain, SegmentationWithWriteLogits, SpleenISegGraphCut, SpleenISegSimpleCRF, SpleenISegCRF
 from lib.activelearning import MyStrategy
 from monai.apps import load_from_mmar
 
@@ -58,6 +58,7 @@ class MyApp(MONAILabelApp):
             ),
             "Histogram+GraphCut": HistogramBasedGraphCut(),
             "ISeg+GraphCut": SpleenISegGraphCut(),
+            "ISeg+MONAICRF": SpleenISegCRF(),
             "ISeg+SimpleCRF": SpleenISegSimpleCRF(),
         }
 
