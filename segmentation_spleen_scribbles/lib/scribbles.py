@@ -20,7 +20,7 @@ from monailabel.scribbles.transforms import (
     MakeISegUnaryd,
     SoftenProbSoftmax,
 )
-from monailabel.utils.others.post import BoundingBoxd, Restored
+from monailabel.transform.post import BoundingBoxd, Restored
 
 
 class SpleenPostProc(InferTask):
@@ -123,7 +123,7 @@ class SpleenISegCRF(SpleenPostProc):
                     scribbles_fg_label=3,
                 ),
                 # optimiser
-                ApplyCRFOptimisationd(unary="unary", pairwise="image", post_proc_label="pred", device="cpu"),
+                ApplyCRFOptimisationd(unary="unary", pairwise="image", post_proc_label="pred", device="cuda"),
             ]
         )
 
@@ -169,8 +169,8 @@ class SpleenISegGraphCut(SpleenPostProc):
                     unary="unary",
                     pairwise="image",
                     post_proc_label="pred",
-                    lamda=10.0,
-                    sigma=15.0,
+                    lamda=1.0,
+                    sigma=0.1,
                 ),
             ]
         )
