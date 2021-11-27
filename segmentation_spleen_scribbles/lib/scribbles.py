@@ -22,6 +22,7 @@ from monailabel.scribbles.transforms import (
 )
 from monailabel.transform.post import BoundingBoxd, Restored
 
+from segmentation_spleen_scribbles.lib.transforms import MakeMIDeepEGDUnaryd
 
 class SpleenPostProc(InferTask):
     """
@@ -32,7 +33,7 @@ class SpleenPostProc(InferTask):
         self,
         dimension,
         description,
-        intensity_range=(-300, 200, 0.0, 1.0),
+        intensity_range=(-300, 200, 0.0, 1.0, True),
         pix_dim=(2.5, 2.5, 5.0),
     ):
         super().__init__(
@@ -54,7 +55,7 @@ class SpleenPostProc(InferTask):
                 a_max=self.intensity_range[1],
                 b_min=self.intensity_range[2],
                 b_max=self.intensity_range[3],
-                clip=True,
+                clip=self.intensity_range[4],
             ),
         ]
 
@@ -87,7 +88,7 @@ class SpleenISegCRF(SpleenPostProc):
         self,
         dimension=3,
         description="A post processing step with ISeg + MONAI's CRF for Spleen segmentation",
-        intensity_range=(-300, 200, 0.0, 1.0),
+        intensity_range=(-300, 200, 0.0, 1.0, True),
         pix_dim=(2.5, 2.5, 5.0),
     ):
         super().__init__(dimension, description, intensity_range, pix_dim)
@@ -105,7 +106,7 @@ class SpleenISegCRF(SpleenPostProc):
                 a_max=self.intensity_range[1],
                 b_min=self.intensity_range[2],
                 b_max=self.intensity_range[3],
-                clip=True,
+                clip=self.intensity_range[4],
             ),
             SoftenProbSoftmax(logits="logits", prob="prob"),
         ]
@@ -147,7 +148,7 @@ class SpleenISegGraphCut(SpleenPostProc):
         self,
         dimension=3,
         description="A post processing step with ISeg + SimpleCRF's GraphCut for Spleen segmentation",
-        intensity_range=(-300, 200, 0.0, 1.0),
+        intensity_range=(-300, 200, 0.0, 1.0, True),
         pix_dim=(2.5, 2.5, 5.0),
     ):
         super().__init__(dimension, description, intensity_range, pix_dim)
@@ -169,7 +170,56 @@ class SpleenISegGraphCut(SpleenPostProc):
                     unary="unary",
                     pairwise="image",
                     post_proc_label="pred",
-                    lamda=1.0,
+                    lamda=5.0,
+                    sigma=0.01,
+                ),
+            ]
+        )
+
+
+class SpleenMIDeepSeg(SpleenPostProc):
+    """
+    MIDeepSeg: https://arxiv.org/pdf/2104.12166.pdf
+
+    TODO: detailed description
+    """
+
+    def __init__(
+        self,
+        dimension=3,
+        description="A post processing step with MIDeepSeg + SimpleCRF's GraphCut for Spleen segmentation",
+        intensity_range=(-300, 200, 0.0, 1.0, True),
+        pix_dim=(2.5, 2.5, 5.0),
+    ):
+        super().__init__(dimension, description, intensity_range, pix_dim)
+
+    def inferer(self):
+        return Compose(
+            [
+                # unary term maker
+                MakeMIDeepEGDUnaryd(
+                    image="image",
+                    logits="logits",
+                    scribbles="label",
+                    unary = "unary",
+                    tau = 1.0,
+                    scribbles_bg_label = 2,
+                    scribbles_fg_label = 3,
+                ),
+                # MakeISegUnaryd(
+                #     image="image",
+                #     logits="logits",
+                #     scribbles="label",
+                #     unary="unary",
+                #     scribbles_bg_label=2,
+                #     scribbles_fg_label=3,
+                # ),
+                # optimiser
+                ApplyGraphCutOptimisationd(
+                    unary="unary",
+                    pairwise="image",
+                    post_proc_label="pred",
+                    lamda=5.0,
                     sigma=0.1,
                 ),
             ]
@@ -195,7 +245,7 @@ class SpleenInteractiveGraphCut(SpleenPostProc):
         self,
         dimension=3,
         description="A post processing step with SimpleCRF's Interactive ISeg GraphCut for Spleen segmentation",
-        intensity_range=(-300, 200, 0.0, 1.0),
+        intensity_range=(-300, 200, 0.0, 1.0, True),
         pix_dim=(2.5, 2.5, 5.0),
     ):
         super().__init__(dimension, description, intensity_range, pix_dim)
@@ -236,7 +286,7 @@ class SpleenISegSimpleCRF(SpleenPostProc):
         self,
         dimension=3,
         description="A post processing step with ISeg + SimpleCRF's CRF for Spleen segmentation",
-        intensity_range=(-300, 200, 0.0, 1.0),
+        intensity_range=(-300, 200, 0.0, 1.0, True),
         pix_dim=(2.5, 2.5, 5.0),
     ):
         super().__init__(dimension, description, intensity_range, pix_dim)
