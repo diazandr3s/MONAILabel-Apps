@@ -26,9 +26,8 @@ from monailabel.tasks.activelearning.tta import TTA
 from monailabel.tasks.scoring.tta import TTAScoring
 
 from lib import (MyTrain, SegmentationWithWriteLogits, SpleenISegCRF,
-                 SpleenISegGraphCut, SpleenISegSimpleCRF)
+                 SpleenISegGraphCut, SpleenISegSimpleCRF, SpleenMIDeepSeg)
 from lib.activelearning import MyStrategy
-from segmentation_spleen_scribbles.lib.scribbles import SpleenMIDeepSeg
 
 
 logger = logging.getLogger(__name__)
@@ -44,7 +43,8 @@ class MyApp(MONAILabelApp):
         self.tta_enabled = strtobool(conf.get("tta_enabled", "false"))
         self.tta_samples = int(conf.get("tta_samples", "5"))
 
-        logger.info(f"TTA Enabled: {self.tta_enabled}; Samples: {self.tta_samples}")
+        logger.info(
+            f"TTA Enabled: {self.tta_enabled}; Samples: {self.tta_samples}")
 
         super().__init__(
             app_dir=app_dir,
