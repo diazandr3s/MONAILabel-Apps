@@ -24,7 +24,6 @@ from monailabel.transform.post import BoundingBoxd, Restored
 
 from segmentation_spleen_scribbles.lib.transforms import MakeMIDeepEGDUnaryd
 
-
 class SpleenPostProc(InferTask):
     """
     Defines a generic post processing task for Spleen segmentation.
