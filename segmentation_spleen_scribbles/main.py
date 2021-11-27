@@ -14,10 +14,7 @@ import os
 from distutils.util import strtobool
 from typing import Dict
 
-from lib import MyTrain, SegmentationWithWriteLogits, SpleenISegGraphCut, SpleenISegSimpleCRF, SpleenISegCRF
-from lib.activelearning import MyStrategy
 from monai.apps import load_from_mmar
-
 from monailabel.interfaces.app import MONAILabelApp
 from monailabel.interfaces.tasks.infer import InferTask, InferType
 from monailabel.interfaces.tasks.scoring import ScoringMethod
@@ -27,6 +24,11 @@ from monailabel.scribbles.infer import HistogramBasedGraphCut
 from monailabel.tasks.activelearning.random import Random
 from monailabel.tasks.activelearning.tta import TTA
 from monailabel.tasks.scoring.tta import TTAScoring
+
+from lib import (MyTrain, SegmentationWithWriteLogits, SpleenISegCRF,
+                 SpleenISegGraphCut, SpleenISegSimpleCRF)
+from lib.activelearning import MyStrategy
+from segmentation_spleen_scribbles.lib.scribbles import SpleenMIDeepSeg
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +42,8 @@ class MyApp(MONAILabelApp):
 
         self.tta_enabled = strtobool(conf.get("tta_enabled", "false"))
         self.tta_samples = int(conf.get("tta_samples", "5"))
-        logger.info(f"TTA Enabled: {self.tta_enabled}; Samples: {self.tta_samples}")
+        logger.info(
+            f"TTA Enabled: {self.tta_enabled}; Samples: {self.tta_samples}")
 
         super().__init__(
             app_dir=app_dir,
@@ -57,6 +60,7 @@ class MyApp(MONAILabelApp):
                 self.final_model, load_from_mmar(self.mmar, self.model_dir)
             ),
             "Histogram+GraphCut": HistogramBasedGraphCut(),
+            "MIDeepSeg": SpleenMIDeepSeg(),
             "ISeg+GraphCut": SpleenISegGraphCut(),
             "ISeg+MONAICRF": SpleenISegCRF(),
             "ISeg+SimpleCRF": SpleenISegSimpleCRF(),
@@ -80,6 +84,7 @@ class MyApp(MONAILabelApp):
         strategies["random"] = Random()
         strategies["first"] = MyStrategy()
         return strategies
+
     def init_scoring_methods(self) -> Dict[str, ScoringMethod]:
         methods: Dict[str, ScoringMethod] = {}
         if self.tta_enabled:
@@ -100,7 +105,8 @@ class MyApp(MONAILabelApp):
             saved_labels = self.datastore().get_labels_by_image_id(image)
             for tag, label in saved_labels.items():
                 if tag == "logits":
-                    request["logits"] = self.datastore().get_label_uri(label, tag)
+                    request["logits"] = self.datastore(
+                    ).get_label_uri(label, tag)
             logger.info(f"Updated request: {request}")
 
         result = super().infer(request)
