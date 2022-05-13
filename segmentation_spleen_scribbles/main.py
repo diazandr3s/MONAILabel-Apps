@@ -38,7 +38,7 @@ class MyApp(MONAILabelApp):
         self.model_dir = os.path.join(app_dir, "model")
         self.final_model = os.path.join(self.model_dir, "model.pt")
 
-        self.mmar = "clara_pt_spleen_ct_segmentation_1"
+        self.mmar = "clara_pt_spleen_ct_segmentation"
 
         self.tta_enabled = strtobool(conf.get("tta_enabled", "false"))
         self.tta_samples = int(conf.get("tta_samples", "5"))
